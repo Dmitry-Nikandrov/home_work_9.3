@@ -1,7 +1,8 @@
 import masks
 
 def mask_account_card(card_info:str)->str:
-    """получает информацию о карте или банковском счете и преобразовывает его в маску"""
+
+    """получает информацию о карте или банковском счете и преобразовывает их в маску с помощью ранее написанных функций"""
     card_info = card_info.split()
     number_mask_list =[]
     for i in card_info:
@@ -14,4 +15,3 @@ def mask_account_card(card_info:str)->str:
                 number_mask_list.append(masks.get_mask_card_number(i))
 
     return ''.join(number_mask_list)
-
