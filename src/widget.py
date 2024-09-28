@@ -1,9 +1,8 @@
 import masks
-from typing import Union
 
 
 def mask_account_card(card_info: str) -> str:
-    """получает информацию о карте или банковском счете и преобразовывает их в маску с помощью ранее написанных функций"""
+    """получает информацию о карте или банковском счете и преобразовывает их в маску с помощью написанных функций"""
     card_info_list = card_info.split()
     number_mask_list = []
     for i in card_info_list:
@@ -19,12 +18,12 @@ def mask_account_card(card_info: str) -> str:
     return number_mask
 
 
-def get_date(date_full: Union[str,list])->str:
+def get_date(date_full: str) -> str:
+    """получает дату в формализованном виде и выводит ее в коротком формате"""
 
-    '''получает дату в формализованном виде и выводит ее в коротком формате'''
-
-    date_short = date_full[0:10].split('-')
-    date = '-'.join(date_short[::-1])
+    date_short = date_full[0:10].split("-")
+    date = "-".join(date_short[::-1])
     return date
 
-print(get_date('2024-03-11T02:26:18.671407'))
+
+print(get_date("2024-03-11T02:26:18.671407"))
