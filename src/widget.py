@@ -1,4 +1,5 @@
 import masks
+from typing import Union
 
 
 def mask_account_card(card_info: str) -> str:
@@ -18,4 +19,12 @@ def mask_account_card(card_info: str) -> str:
     return number_mask
 
 
-print(mask_account_card("Maestro 7000792289606361"))
+def get_date(date_full: Union[str,list])->str:
+
+    '''получает дату в формализованном виде и выводит ее в коротком формате'''
+
+    date_short = date_full[0:10].split('-')
+    date = '-'.join(date_short[::-1])
+    return date
+
+print(get_date('2024-03-11T02:26:18.671407'))
