@@ -28,14 +28,14 @@ def get_mask_card_number(card_number: Union[str, int, None]) -> str:
                 return card_number_mask
 
 
-def card_number_mask(card_number: Union[str, int]) -> str:
+def get_mask_account(card_number: Union[str, int]) -> str:
     """получает 20-ти значный номер карты и преобразовывает его короткую маску"""
     if card_number == None:
         return "0"
     else:
         card_number = str(card_number)
         if len(card_number) > 20:
-            return "слишком длинный номер карты"
+            return "число цифр в счете больше 20"
         else:
             if not card_number.isdigit():
                 return "присутствие нечисловых символов"
