@@ -1,7 +1,33 @@
 import pytest
 
-from src.processing import *
-from src.widget import *
+from src.masks import get_mask_account, get_mask_card_number
+from src.processing import filter_by_state, sort_by_date
+from src.widget import get_date, mask_account_card
+
+
+@pytest.fixture
+def card_number_small():
+    return "1234567890167890"
+
+
+@pytest.fixture
+def bill_with_letter():
+    return "123456789016789a"
+
+
+@pytest.fixture
+def card_number_long():
+    return "123456789016789012334"
+
+
+@pytest.fixture
+def card_number_zero():
+    return "0"
+
+
+@pytest.fixture
+def card_number():
+    return "59872364587512369547"
 
 
 def test_get_mask_card_number(card_number, card_number_small, bill_with_letter, card_number_long, card_number_zero):
@@ -12,10 +38,25 @@ def test_get_mask_card_number(card_number, card_number_small, bill_with_letter, 
     assert get_mask_card_number(card_number_long) == "слишком длинный номер карты"
 
 
+@pytest.fixture
+def bill_long():
+    return "5987236458751236954712"
+
+
 def test_get_mask_account(card_number_small, bill_long):
     assert get_mask_account(card_number_small) == "**7890"
     assert get_mask_account(bill_long) == "число цифр в счете больше 20"
     assert get_mask_account("12345678901678877901") == "**7901"
+
+
+@pytest.fixture
+def date_normal():
+    return "2024-03-11T02:26:18.671407"
+
+
+@pytest.fixture
+def date_with_letters():
+    return "2025-03-132T02:26****"
 
 
 def test_get_date(date_normal, date_with_letters):
@@ -24,6 +65,29 @@ def test_get_date(date_normal, date_with_letters):
     assert get_date("0") == "0"
     assert get_date(None) == "0"
     assert get_date("25-03-13") == ("недопустимая длина строки")
+
+
+@pytest.fixture
+def card_visa():
+    return "Visa Platinum 7000792289606361"
+
+
+@pytest.fixture
+def card_maestro():
+    return "Maestro 1596837868705199"
+
+
+@pytest.fixture
+def account():
+    return "Счет 64686473678894779589"
+
+
+def test_mask_account_card_2(card_visa, card_maestro, account):
+    assert mask_account_card(card_visa) == "Visa Platinum 7000 79** **** 6361"
+    assert mask_account_card(account) == "Счет **9589"
+    assert mask_account_card(card_maestro) == "Maestro 1596 83** **** 5199"
+    assert mask_account_card("0") == "данные отсутствуют или заданы неправильно"
+    assert mask_account_card(None) == "данные отсутствуют или заданы неправильно"
 
 
 @pytest.mark.parametrize(
@@ -41,14 +105,6 @@ def test_get_date(date_normal, date_with_letters):
 )
 def test_mask_account_card_1(card_info, expected_result):
     assert mask_account_card(card_info) == expected_result
-
-
-def test_mask_account_card_2(card_visa, card_maestro, account):
-    assert mask_account_card(card_visa) == "Visa Platinum 7000 79** **** 6361"
-    assert mask_account_card(account) == "Счет **9589"
-    assert mask_account_card(card_maestro) == "Maestro 1596 83** **** 5199"
-    assert mask_account_card("0") == "данные отсутствуют или заданы неправильно"
-    assert mask_account_card(None) == "данные отсутствуют или заданы неправильно"
 
 
 @pytest.mark.parametrize(
@@ -83,6 +139,36 @@ def test_mask_account_card_2(card_visa, card_maestro, account):
 )
 def test_filter_by_state(list_data, state, expected_result):
     assert filter_by_state(list_data, state) == expected_result
+
+
+@pytest.fixture
+def data_list():
+    return [
+        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+        {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+        {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
+    ]
+
+
+@pytest.fixture
+def data_equal():
+    return [
+        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+        {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+    ]
+
+
+@pytest.fixture
+def data_incorrect():
+    return [
+        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+        {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+        {"id": 594226727, "state": "CANCELED", "date": None},
+        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+    ]
 
 
 def test_sort_by_date(data_list, data_equal, data_incorrect):
