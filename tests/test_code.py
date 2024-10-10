@@ -1,5 +1,6 @@
 import pytest
 
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
 from src.widget import get_date, mask_account_card
@@ -190,3 +191,231 @@ def test_sort_by_date(data_list, data_equal, data_incorrect):
         {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
         {"id": 594226727, "state": "CANCELED", "date": None},
     ]
+
+
+@pytest.fixture
+def data_cur():
+    return [
+        {
+            "id": 789654123,
+            "state": "EXECUTED",
+            "date": "2023-04-04T23:20:05.206878",
+            "operationAmount": {"amount": "79114.93", "currency": {"name": "EUR", "code": "USD"}},
+            "description": "Перевод организации",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188",
+        },
+        {
+            "id": 939719570,
+            "state": "EXECUTED",
+            "date": "2018-06-30T02:08:58.425572",
+            "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
+            "description": "Перевод организации",
+            "from": "Счет 75106830613657916952",
+            "to": "Счет 11776614605963066702",
+        },
+        {
+            "id": 142264268,
+            "state": "EXECUTED",
+            "date": "2019-04-04T23:20:05.206878",
+            "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
+            "description": "Перевод со счета на счет",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188",
+        },
+    ]
+
+
+@pytest.fixture
+def currency_v():
+    return "EUR"
+
+
+def test_filter_by_currency(data_cur, currency_v):
+    data_cur_list = list(filter_by_currency(data_cur, currency_v))
+    assert data_cur_list == [
+        {
+            "id": 789654123,
+            "state": "EXECUTED",
+            "date": "2023-04-04T23:20:05.206878",
+            "operationAmount": {"amount": "79114.93", "currency": {"name": "EUR", "code": "USD"}},
+            "description": "Перевод организации",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188",
+        },
+    ]
+
+
+@pytest.mark.parametrize(
+    "list_data, currency, expected_result",
+    [
+        (
+            [
+                {
+                    "id": 939719570,
+                    "state": "EXECUTED",
+                    "date": "2018-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                },
+                {
+                    "id": 142264268,
+                    "state": "EXECUTED",
+                    "date": "2019-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                },
+                {
+                    "id": 978545569,
+                    "state": "EXECUTED",
+                    "date": "2020-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                },
+                {
+                    "id": 789654123,
+                    "state": "EXECUTED",
+                    "date": "2023-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                },
+            ],
+            "EUR",
+            [
+                {
+                    "id": 978545569,
+                    "state": "EXECUTED",
+                    "date": "2020-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                },
+                {
+                    "id": 789654123,
+                    "state": "EXECUTED",
+                    "date": "2023-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                },
+            ],
+        )
+    ],
+)
+def test_filter_by_currency2(list_data, currency, expected_result):
+    a = list(filter_by_currency(list_data, currency))
+    assert a == expected_result
+
+
+def test_transaction_descriptions(data_cur):
+    assert next(transaction_descriptions(data_cur)) == "Перевод организации"
+
+
+@pytest.mark.parametrize(
+    "list_data, expected_result",
+    [
+        (
+            [
+                {
+                    "id": 939719570,
+                    "state": "EXECUTED",
+                    "date": "2018-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                }
+            ],
+            "Перевод организации",
+        ),
+        (
+            [
+                {
+                    "id": 142264268,
+                    "state": "EXECUTED",
+                    "date": "2019-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                }
+            ],
+            "Перевод со счета на счет",
+        ),
+        (
+            [
+                {
+                    "id": 978545569,
+                    "state": "EXECUTED",
+                    "date": "2020-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                }
+            ],
+            "Перевод организации",
+        ),
+        (
+            [
+                {
+                    "id": 789654123,
+                    "state": "EXECUTED",
+                    "date": "2023-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "EUR", "code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                }
+            ],
+            "Перевод со счета на счет",
+        ),
+    ],
+)
+def test_transaction_descriptions2(list_data, expected_result):
+    assert next(transaction_descriptions(list_data)) == expected_result
+
+
+@pytest.fixture
+def card_number_gen():
+    return "0000 0000 0000 0000 0001"
+
+
+@pytest.fixture
+def start():
+    return 1
+
+
+@pytest.fixture
+def stop():
+    return 3
+
+
+def test_card_number_generator(start, stop, card_number_gen):
+    assert (next(card_number_generator(start, stop))) == "0000 0000 0000 0000 0001"
+    assert (next(card_number_generator(start + 1, stop))) == "0000 0000 0000 0000 0002"
+
+
+@pytest.mark.parametrize(
+    "start, stop, expected_result",
+    [
+        (1, 2, "0000 0000 0000 0000 0001"),
+        (3, 5, "0000 0000 0000 0000 0003"),
+        (4, 5, "0000 0000 0000 0000 0004"),
+        (2, 2, "0000 0000 0000 0000 0002"),
+        (2, 5, "0000 0000 0000 0000 0002"),
+        (100, 1000, "0000 0000 0000 0000 0100"),
+    ],
+)
+def test_card_number_generator2(start, stop, expected_result):
+    assert (next(card_number_generator(start, stop))) == expected_result
