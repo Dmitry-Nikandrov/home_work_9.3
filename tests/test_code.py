@@ -1,5 +1,6 @@
 import pytest
 
+from src.decorators import log
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
@@ -419,3 +420,52 @@ def test_card_number_generator(start, stop, card_number_gen):
 )
 def test_card_number_generator2(start, stop, expected_result):
     assert (next(card_number_generator(start, stop))) == expected_result
+
+
+@log()
+def arifm_numb(a, b):
+    '''проверяет работу декаоратор: делит заданные числа'''
+    return a / b
+
+
+def test_log_1(capsys):
+    arifm_numb(6, 1)
+    captured = capsys.readouterr()
+    print(captured.out)
+    assert captured.out == "arifm_numb function - ok. Result - 6.0\n"
+
+
+def test_log_2(capsys):
+    arifm_numb(6, 0)
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "arifm_numb function error: division by zero. Inputs: ((6, 0)),{}\n"
+        != "arifm_numb function - ok\n"
+    )
+
+
+@log("log.txt")
+def arifm_numb_full(a, b):
+    '''проверяет работу декаоратор: делит заданные числа'''
+    return a / b
+
+
+def test_log_4(capsys):
+    arifm_numb_full(6, 2)
+    captured = capsys.readouterr()
+    with open("log.txt", "r") as file:
+        content = file.read()
+        if captured.out in content:
+            chek_num = "correct write"
+            assert chek_num == "correct write"
+
+
+def test_log_5(capsys):
+    arifm_numb_full(6, 0)
+    with open("log.txt", "r") as file:
+        content = file.read()
+        check_str = "arifm_numb_full function error: division by zero. Inputs: ((6, 0)),{}11"
+        if check_str in content:
+            chek_num = "correct write"
+            assert chek_num == "correct write"
