@@ -1,9 +1,13 @@
+from unittest.mock import mock_open, patch
+
 import pytest
 
 from src.decorators import log
+from src.external_api import convert_currency
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
+from src.utils import get_json_data, result_transactions
 from src.widget import get_date, mask_account_card
 
 
@@ -424,7 +428,7 @@ def test_card_number_generator2(start, stop, expected_result):
 
 @log()
 def arifm_numb(a, b):
-    '''проверяет работу декаоратор: делит заданные числа'''
+    """проверяет работу декаоратор: делит заданные числа"""
     return a / b
 
 
@@ -447,7 +451,7 @@ def test_log_2(capsys):
 
 @log("log.txt")
 def arifm_numb_full(a, b):
-    '''проверяет работу декаоратор: делит заданные числа'''
+    """проверяет работу декаоратор: делит заданные числа"""
     return a / b
 
 
@@ -469,3 +473,72 @@ def test_log_5(capsys):
         if check_str in content:
             chek_num = "correct write"
             assert chek_num == "correct write"
+
+
+@patch("requests.get")
+def test_convert_currency_1(mock_data):
+    mock_data.return_value.json.return_value = {
+        "success": True,
+        "query": {"from": "USD", "to": "RUB", "amount": 1},
+        "info": {"timestamp": 1729704002, "rate": 96.401344},
+        "date": "2024-10-23",
+        "result": 96.401344,
+    }
+    mock_data.return_value.status_code = 200
+    assert convert_currency("USD", 1) == 96.401344
+
+
+@patch("requests.get")
+def test_convert_currency_2(mock_data):
+    mock_data.return_value.json.return_value = {
+        "success": True,
+        "query": {"from": "USD", "to": "RUB", "amount": 1},
+        "info": {"timestamp": 1729704002, "rate": 96.401344},
+        "date": "2024-10-23",
+        "result": 96.401344,
+    }
+    mock_data.return_value.status_code = 429
+    assert convert_currency("USD", 1) == f"Неудачная попытка входа, статус 429"
+
+
+@patch("src.utils.result_transactions")
+def test_result_transactions(mock_amount):
+    mock_amount.return_value = 100
+    assert (
+        result_transactions(
+            {
+                "id": 667307132,
+                "state": "EXECUTED",
+                "date": "2019-07-13T18:51:29.313309",
+                "operationAmount": {"amount": "100", "currency": {"name": "руб.", "code": "RUB"}},
+                "description": "Перевод с карты на счет",
+                "from": "Maestro 1308795367077170",
+                "to": "Счет 96527012349577388612",
+            }
+        )
+        == 100
+    )
+
+
+@patch("builtins.open", new_callable=mock_open, read_data='[{"amount": 100, "currency": "USD"}]')
+def test_get_json_data(mock_file):
+    transactions = get_json_data("data/operations.json")
+    assert transactions == [{"amount": 100, "currency": "USD"}]
+
+
+@patch("builtins.open", new_callable=mock_open, read_data="")
+def test_get_json_data_2(mock_file):
+    transactions = get_json_data("data/operations.json")
+    assert transactions == []
+
+
+@patch("builtins.open", new_callable=mock_open, read_data='{"amount": 100}')
+def test_get_json_data_3(mock_file):
+    transactions = get_json_data("data/operations.json")
+    assert transactions == []
+
+
+@patch("builtins.open", side_effect=FileNotFoundError)
+def test_get_json_data_4(mock_file):
+    transactions = get_json_data("data/operations.json")
+    assert transactions == []
