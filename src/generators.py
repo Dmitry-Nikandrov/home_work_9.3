@@ -1,6 +1,10 @@
-def filter_by_currency(list_data, currency):
+def filter_by_currency_json(list_data, currency):
     """отбирает информацию о транзакциях по указанной валюте"""
     return (i for i in list_data if i["operationAmount"]["currency"]["name"] == currency)
+
+def filter_by_currency_csv_excel(list_data, currency):
+    """отбирает информацию о транзакциях по указанной валюте"""
+    return (i for i in list_data if i["currency_code"] == currency)
 
 
 def transaction_descriptions(list_data):
