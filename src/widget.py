@@ -30,8 +30,8 @@ def get_date(date_full: str) -> str:
         return "недопустимая длина строки"
     else:
         date_short = date_full[0:10].split("-")
-        date = "-".join(date_short[::-1])
+        date = ".".join(date_short[::-1])
         return date
 
 
-print(get_date([1, 2, 3]))
+# print(get_date([1, 2, 3]))

@@ -49,11 +49,11 @@ def get_mask_card_number(card_number: Union[str, int, None]) -> str:
                 return card_number_mask
 
 
-"Примеры логирования функции get_mask_card_number с записью в соответствующем файле .log в папке logs"
-print(get_mask_card_number(1234567890123456789011))
-print(get_mask_card_number(123456789012345678901111))
-print(get_mask_card_number("1234567890123456701a"))
-print(get_mask_card_number(12345678901234567890))
+# "Примеры логирования функции get_mask_card_number с записью в соответствующем файле .log в папке logs"
+# print(get_mask_card_number(1234567890123456789011))
+# print(get_mask_card_number(123456789012345678901111))
+# print(get_mask_card_number("1234567890123456701a"))
+# print(get_mask_card_number(12345678901234567890))
 
 
 def get_mask_account(card_number: Union[str, int, None]) -> str:
@@ -76,8 +76,8 @@ def get_mask_account(card_number: Union[str, int, None]) -> str:
                 return card_number_mask
 
 
-"Примеры логирования функции get_mask_account с записью в соответствующем файле .log в папке logs"
-print(get_mask_account(None))
-print(get_mask_account(98765432109876543219911))
-print(get_mask_account("9876543210987654321ф"))
-print(get_mask_account(98765432109876543211))
+# "Примеры логирования функции get_mask_account с записью в соответствующем файле .log в папке logs"
+# print(get_mask_account(None))
+# print(get_mask_account(98765432109876543219911))
+# print(get_mask_account("9876543210987654321ф"))
+# print(get_mask_account(98765432109876543211))
