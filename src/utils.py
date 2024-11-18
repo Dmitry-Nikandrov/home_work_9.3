@@ -4,43 +4,44 @@ import os
 
 from src.external_api import convert_currency
 
-get_json_data_logger = logging.getLogger("get_json_data")
-get_json_data_handler = logging.FileHandler(filename="../logs/get_json_data.log", mode="w", encoding="utf-8")
-get_json_data_formatter = logging.Formatter(
-    "%(asctime)s - %(filename)s - %(funcName)s - %(name)s - %(levelname)s - %(message)s"
-)
-get_json_data_handler.setFormatter(get_json_data_formatter)
-get_json_data_logger.addHandler(get_json_data_handler)
-get_json_data_logger.setLevel(logging.DEBUG)
+# get_json_data_logger = logging.getLogger("get_json_data")
+# get_json_data_handler = logging.FileHandler(filename="../logs/get_json_data.log", mode="w", encoding="utf-8")
+# get_json_data_formatter = logging.Formatter(
+#     "%(asctime)s - %(filename)s - %(funcName)s - %(name)s - %(levelname)s - %(message)s"
+# )
+# get_json_data_handler.setFormatter(get_json_data_formatter)
+# get_json_data_logger.addHandler(get_json_data_handler)
+# get_json_data_logger.setLevel(logging.DEBUG)
+#
+# result_transactions_logger = logging.getLogger("result_transactions")
+# result_transactions_handler = logging.FileHandler(
+#     filename="../logs/result_transactions.log", mode="w", encoding="utf-8"
+# )
+# result_transactions_formatter = logging.Formatter(
+#     "%(asctime)s - %(filename)s - %(funcName)s - %(name)s - %(levelname)s - %(message)s"
+# )
+# result_transactions_handler.setFormatter(result_transactions_formatter)
+# result_transactions_logger.addHandler(result_transactions_handler)
+# result_transactions_logger.setLevel(logging.DEBUG)
 
-result_transactions_logger = logging.getLogger("result_transactions")
-result_transactions_handler = logging.FileHandler(
-    filename="../logs/result_transactions.log", mode="w", encoding="utf-8"
-)
-result_transactions_formatter = logging.Formatter(
-    "%(asctime)s - %(filename)s - %(funcName)s - %(name)s - %(levelname)s - %(message)s"
-)
-result_transactions_handler.setFormatter(result_transactions_formatter)
-result_transactions_logger.addHandler(result_transactions_handler)
-result_transactions_logger.setLevel(logging.DEBUG)
 
-
-def get_json_data(path='../data/operations.json'):
+def get_json_data(path="../data/operations.json"):
     """считывает json данные их стороннего файла и преобразовывает их в пайтон объект"""
-    #path_to_file = os.path.join(os.path.dirname(__file__)[:-3], "data", filename)
-    get_json_data_logger.info(f"Получение динамической ссылки на json-файл:{path}")
+    # path_to_file = os.path.join(os.path.dirname(__file__)[:-3], "data", filename)
+    # get_json_data_logger.info(f"Получение динамической ссылки на json-файл:{path}")
     try:
         with open(path, encoding="utf-8") as file:
             data_list = json.load(file)
-            get_json_data_logger.info(f"Преобразование в объект python json-файла")
+            # get_json_data_logger.info(f"Преобразование в объект python json-файла")
             if type(data_list) == list:
-                get_json_data_logger.info(f"Окончание преобразования json-файла в объект python")
+                # get_json_data_logger.info(f"Окончание преобразования json-файла в объект python")
                 return data_list
             else:
                 return []
     except Exception:
-        get_json_data_logger.error(f"ошибка преобразования json-файла в объект python")
+        # get_json_data_logger.error(f"ошибка преобразования json-файла в объект python")
         return []
+
 
 # "Примеры логирования функции get_json_data с записью в соответствующем файле .log в папке logs"
 # print(get_json_data("operations.json"))
@@ -56,20 +57,16 @@ def result_transactions(data):
             )
             == list
         ):
-            result_transactions_logger.info(
-                f"""успешное завершение конвертации
-            {data["operationAmount"]["currency"]["code"]} в рубли и возвращение рублевой суммы транзакции"""
-            )
+            #result_transactions_logger.info(f"""успешное завершение конвертации {data["operationAmount"]
+        # ["currency"]["code"]} в рубли и возвращение рублевой суммы транзакции""")
         else:
-            result_transactions_logger.info(
-                f"""неудачная попытка конвертации {data["operationAmount"]["currency"]["code"]}
-            в рубли """
-            )
+            # result_transactions_logger.info(f"""неудачная попытка конвертации {data
+            # ["operationAmount"]["currency"]["code"]} в рубли """)
         return convert_currency(data["operationAmount"]["currency"]["code"], float(data["operationAmount"]["amount"]))
     else:
-        result_transactions_logger.info(f"""отображение рублевой суммы транзакции (исходный код валюты -
-        {data["operationAmount"]["currency"]["code"]}"""
-        )
+        # result_transactions_logger.info(f"""отображение рублевой суммы транзакции (исходный код валюты -
+        # {data["operationAmount"]["currency"]["code"]}"""
+        # )
         return float(data["operationAmount"]["amount"])
 
 
