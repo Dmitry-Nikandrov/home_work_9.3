@@ -51,15 +51,14 @@ def get_json_data(path="../data/operations.json"):
 def result_transactions(data):
     """возвращает сумму сделки согласно данным транзакций"""
     if data["operationAmount"]["currency"]["code"] in ["EUR", "USD"]:
-        if (
-            type(
-                convert_currency(data["operationAmount"]["currency"]["code"], float(data["operationAmount"]["amount"]))
-            )
-            == list
-        ):
+        # if (
+            # type(
+               # convert_currency(data["operationAmount"]["currency"]["code"], float(data["operationAmount"]["amount"]))
+            # ) == list
+        # ):
             #result_transactions_logger.info(f"""успешное завершение конвертации {data["operationAmount"]
         # ["currency"]["code"]} в рубли и возвращение рублевой суммы транзакции""")
-        else:
+        # else:
             # result_transactions_logger.info(f"""неудачная попытка конвертации {data
             # ["operationAmount"]["currency"]["code"]} в рубли """)
         return convert_currency(data["operationAmount"]["currency"]["code"], float(data["operationAmount"]["amount"]))
